@@ -52,8 +52,9 @@ class App extends Component {
       date_in:new Date(),
       date_fin:new Date(),
       openPanel:false,
-      ID:''
+      ID:{value:"1",label:"Camion 1"}
     }
+
   }
 
   callAPI_actual(){
@@ -183,9 +184,9 @@ class App extends Component {
             }
             this.setState({
               sw_realtime:checked
-            })
+            });
           }}
-      />
+    />
     </div>
 
     <h5 style={{top:"10%",left:"2%",zIndex:"10",position:"absolute"}}>Show history:</h5>
