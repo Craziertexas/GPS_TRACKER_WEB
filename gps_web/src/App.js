@@ -40,8 +40,8 @@ class App extends Component {
     super();
     this.state={
       coord:{
-        lat:8.75,
-        lng:-75.883}
+        lat:10.9878,
+        lng:-74.7889 }
       ,
       lat:8.75,
       lng:-75.883,
