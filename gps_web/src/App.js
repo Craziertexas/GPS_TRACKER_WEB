@@ -231,7 +231,7 @@ class App extends Component {
         returnValue={'start'}
         onChange={(value) => this.setState({date_in: value})}
         value={this.state.date_in}
-        maxDate={new Date()}
+        maxDate={this.state.date_fin}
       />
     </div>
 
