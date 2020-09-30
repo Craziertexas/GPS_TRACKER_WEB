@@ -69,11 +69,18 @@ function Updatetable(){
 
 }
 
+function Getusers(){
+  con.query(("SELECT DISTINCT truck FROM gps;"),
+  function(err,result){
+    global.users=JSON.parse(JSON.stringify(result));
+    console.log(global.users);
+  });
+}
+
 function GetLast(){
  con.query((("SELECT lat,lng,alt,timegps FROM gps WHERE truck = ").concat((global.truck).toString()," ORDER BY id desc limit 1")),
  function (err,result){
   global.lastmessage=JSON.parse(JSON.stringify(result));
-  console.log(global.lastmessage);
  }); 
 }
 
@@ -118,6 +125,18 @@ router.get("/", function(req, res, next) {
     console.log('\n')
     GetLast();
     res.json(global.lastmessage);
+  }catch(error){
+    console.error();
+  }
+  
+});
+
+router.get("/users", function(req, res, next) {
+
+  try{
+    console.log('\n')
+    Getusers();
+    res.json(global.users);
   }catch(error){
     console.error();
   }

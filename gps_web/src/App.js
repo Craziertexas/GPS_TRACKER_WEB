@@ -16,6 +16,8 @@ const API_URL_2=process.env.REACT_APP_API_URL_2;
 
 const API_URL_3=process.env.REACT_APP_API_URL_3;
 
+const API_URL_4=process.env.REACT_APP_API_URL_4;
+
 const mapContainerStyle = {
   width: "100vw",
   height: "100vh",
@@ -45,16 +47,27 @@ class App extends Component {
       ,
       lat:8.75,
       lng:-75.883,
-      coord_text:"",
+      coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
       sw_realtime:true,
       sw_history:false,
       history:[],
       date_in:new Date(),
       date_fin:new Date(),
       openPanel:false,
-      ID:{value:"1",label:"Camion 1"}
+      ID:{value:"1",label:"Camion 1"},
+      Opt:[]
     }
 
+  }
+
+  callAPI_users(){
+    axios.get(API_URL_4)
+      .then((res)=>{
+        for (var i=0; i<((res.data).length); i++){
+          this.state.Opt.push({value:(((res.data)[i]).truck), label:("Camion ").concat((((res.data)[i]).truck).toString())})
+        } 
+      });
+    console.log(this.state.Opt);
   }
 
   callAPI_actual(){
@@ -120,6 +133,7 @@ class App extends Component {
 
   componentDidMount(){
     console.log("Al components mounted");
+    this.callAPI_users();
     this.set_timer1();
   }
 
@@ -181,6 +195,9 @@ class App extends Component {
               this.set_timer1();
             }else{
               clearInterval(this.timer1);
+              this.setState({
+                coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"}
+              });
             }
             this.setState({
               sw_realtime:checked
@@ -233,7 +250,7 @@ class App extends Component {
 
     <div style={{position:"absolute",top:"46%",left:"2%",zIndex:"10",width:"25%"}}>
       <Select 
-        options={[{value:"1",label:"Camion 1"},{value:"2",label:"Camion 2"}]} 
+        options={this.state.Opt} 
         //isMulti
         value={this.state.ID}
         onChange={(value)=>{
