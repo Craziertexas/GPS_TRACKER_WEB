@@ -7,10 +7,11 @@ var ENV = require('./env.json')
 const wait= require("@testing-library/react");
 
 global.id=0;
-global.hist=[];
+global.hist=[[]];
 global.time_in=0;
 global.time_fin=0;
 global.truck=0;
+global.lastmessage=[];
 
 const HOST=ENV.HOST;
 const USER=ENV.USER;
@@ -80,7 +81,7 @@ function Getusers(){
 function GetLast(){
  con.query((("SELECT lat,lng,alt,timegps FROM gps WHERE truck = ").concat((global.truck).toString()," ORDER BY id desc limit 1")),
  function (err,result){
-  global.lastmessage=JSON.parse(JSON.stringify(result));
+  global.lastmessage[global.truck]=JSON.parse(JSON.stringify(result));
  }); 
 }
 
@@ -88,7 +89,7 @@ function Gethistory(){
 
   con.query((("SELECT lat,lng FROM gps WHERE truck = ").concat((global.truck).toString()," AND timegps BETWEEN ",(global.time_in).toString(),' and ',(global.time_fin).toString())),function(err,result){
     if(err){throw err};
-    global.hist=JSON.parse(JSON.stringify(result));
+    global.hist[global.truck]=JSON.parse(JSON.stringify(result));
   });
 
 }
@@ -124,7 +125,7 @@ router.get("/", function(req, res, next) {
   try{
     console.log('\n')
     GetLast();
-    res.json(global.lastmessage);
+    res.json(global.lastmessage[global.truck]);
   }catch(error){
     console.error();
   }
@@ -147,7 +148,7 @@ router.get("/history", function(req, res, next) {
 
   try{
     Gethistory();
-    res.json(global.hist);
+    res.json(global.hist[global.truck]);
   }catch(error){
     console.error();
   }
