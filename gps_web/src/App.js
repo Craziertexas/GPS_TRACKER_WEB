@@ -55,7 +55,8 @@ class App extends Component {
       date_fin:new Date(),
       openPanel:false,
       ID:{value:"1",label:"Camion 1"},
-      Opt:[]
+      Opt:[],
+      sw_his_tag:false
     }
 
   }
@@ -214,8 +215,14 @@ class App extends Component {
           onChange={(checked)=>{
             if(checked){
               this.set_timer2();
+              this.setState({
+                sw_his_tag:true
+              });
             }else{
               clearInterval(this.timer2);
+              this.setState({
+                sw_his_tag:false
+              });
             }
             this.setState({
               sw_history:checked
@@ -284,6 +291,18 @@ class App extends Component {
     <Marker
       position={this.state.coord}
       icon={"/truck.svg"}
+    />
+
+    <Marker
+      position={this.state.history[(this.state.history.length-1)]}
+      icon={"/mapa.svg"}
+      visible={this.state.sw_his_tag}
+    />
+
+    <Marker
+      position={this.state.history[0]}
+      icon={"/ubicacion.svg"}
+      visible={this.state.sw_his_tag}
     />
 
     </GoogleMap>
