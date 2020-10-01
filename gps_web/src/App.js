@@ -10,13 +10,11 @@ import Select from 'react-select';
 
 const API_KEY=process.env.REACT_APP_MAPS_API;
 
-const API_URL=process.env.REACT_APP_API_URL;
+const API_URL_1=process.env.REACT_APP_API_URL_1;
 
 const API_URL_2=process.env.REACT_APP_API_URL_2;
 
 const API_URL_3=process.env.REACT_APP_API_URL_3;
-
-const API_URL_4=process.env.REACT_APP_API_URL_4;
 
 const mapContainerStyle = {
   width: "100vw",
@@ -63,65 +61,57 @@ class App extends Component {
   }
 
   callAPI_users(){
-    axios.get(API_URL_4)
+    axios.get(API_URL_3)
       .then((res)=>{
         for (var i=0; i<((res.data).length); i++){
           this.state.Opt.push({value:(((res.data)[i]).truck), label:("Camion ").concat((((res.data)[i]).truck).toString())})
         } 
       });
-    console.log(this.state.Opt);
   }
 
   callAPI_actual(){
 
-    axios.post(API_URL_3,({
-      timestamp_in:(this.state.date_in).getTime(),
-      timestamp_fin:(this.state.date_fin).getTime(),
+    axios.post(API_URL_1,({
       ID:((this.state.ID).value)
-    }));
+    }))
+      .then((res) => {
+        console.log(res.data);
+        try{
+          this.setState({
+            coord:{
+              lat:res.data[0].lat,
+              lng:res.data[0].lng
+            }
+          });
 
-    axios.get(API_URL) 
+          var buff_lat=(res.data[0].lat).toString();
+          var buff_lng=(res.data[0].lng).toString();
+          var buff_time=(res.data[0].timegps).toString();
+          var buff_alt=(res.data[0].alt).toString();
 
-    .then((res) => {
-      console.log(res.data);
-      try{
-        this.setState({
-          coord:{
-            lat:res.data[0].lat,
-            lng:res.data[0].lng
-          }
-        });
-
-        var buff_lat=(res.data[0].lat).toString();
-        var buff_lng=(res.data[0].lng).toString();
-        var buff_time=(res.data[0].timegps).toString();
-        var buff_alt=(res.data[0].alt).toString();
-
-        this.setState({
-          coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
-        });
-      }catch(error){
-        console.log(Error);
-      };
-    });
-
+          this.setState({
+            coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
+          });
+        }catch(error){
+          console.log(Error);
+        };
+      });
   }
   
   callAPI_history(){
     
-    axios.post(API_URL_3,({
+    axios.post(API_URL_2,({
       timestamp_in:(this.state.date_in).getTime(),
       timestamp_fin:(this.state.date_fin).getTime(),
       ID:((this.state.ID).value)
-    }));
+    }))
 
-    axios.get(API_URL_2)
-    .then((res) => { 
-      var buff = (res.data); 
-      this.setState({
-        history:buff
+      .then((res) => { 
+        var buff = (res.data); 
+        this.setState({
+          history:buff
+        });
       });
-    });
     
   }
 
@@ -264,7 +254,7 @@ class App extends Component {
       <Select 
         options={this.state.Opt} 
         //isMulti
-        isDisabled={true}
+        isDisabled={false}
         value={this.state.ID}
         onChange={(value)=>{
           this.setState({
