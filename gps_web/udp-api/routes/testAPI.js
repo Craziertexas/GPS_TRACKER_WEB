@@ -3,7 +3,7 @@ var mysql = require('mysql');
 const stringify= require("querystring");
 var router = express.Router();
 var udp = require('dgram');
-var ENV = require('./env.json')
+var ENV = require('./env.json');
 const wait= require("@testing-library/react");
 
 global.id=0;
@@ -111,6 +111,7 @@ server.on('listening',function(){
 });
 
 server.on('message',function(msg,info){
+  
   try{
     global.message = msg.toString();
     Updatetable()

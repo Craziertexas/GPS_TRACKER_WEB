@@ -56,7 +56,8 @@ class App extends Component {
       openPanel:false,
       ID:{value:"1",label:"Camion 1"},
       Opt:[],
-      sw_his_tag:false
+      sw_his_tag:false,
+      sw_tag:true
     }
 
   }
@@ -194,10 +195,14 @@ class App extends Component {
           onChange={(checked)=>{
             if(checked){
               this.set_timer1();
+              this.setState({
+                sw_tag:true
+              });
             }else{
               clearInterval(this.timer1);
               this.setState({
-                coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"}
+                coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
+                sw_tag:false
               });
             }
             this.setState({
@@ -259,6 +264,7 @@ class App extends Component {
       <Select 
         options={this.state.Opt} 
         //isMulti
+        isDisabled={true}
         value={this.state.ID}
         onChange={(value)=>{
           this.setState({
@@ -291,6 +297,7 @@ class App extends Component {
     <Marker
       position={this.state.coord}
       icon={"/truck.svg"}
+      visible={this.state.sw_tag}
     />
 
     <Marker
