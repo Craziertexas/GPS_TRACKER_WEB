@@ -8,13 +8,15 @@ import Switch from "react-switch";
 import SlidingPanel from 'react-sliding-side-panel';
 import Select from 'react-select';
 
-const API_KEY=process.env.REACT_APP_MAPS_API;
+const API_KEY = process.env.REACT_APP_MAPS_API;
 
-const API_URL_1=process.env.REACT_APP_API_URL_1;
+const API_URL_1 = process.env.REACT_APP_API_URL_1;
 
-const API_URL_2=process.env.REACT_APP_API_URL_2;
+const API_URL_2 = process.env.REACT_APP_API_URL_2;
 
-const API_URL_3=process.env.REACT_APP_API_URL_3;
+const API_URL_3 = process.env.REACT_APP_API_URL_3;
+
+const API_URL_4 = process.env.REACT_APP_API_URL_4;
 
 const mapContainerStyle = {
   width: "100vw",
@@ -55,7 +57,10 @@ class App extends Component {
       ID:{value:"1",label:"Camion 1"},
       Opt:[],
       sw_his_tag:false,
-      sw_tag:true
+      sw_tag:true,
+      sw_trace:true,
+      trace:[],
+      trace_init:new Date(),
     }
 
   }
@@ -65,7 +70,7 @@ class App extends Component {
       .then((res)=>{
         for (var i=0; i<((res.data).length); i++){
           this.state.Opt.push({value:(((res.data)[i]).truck), label:("Camion ").concat((((res.data)[i]).truck).toString())})
-        } 
+        }
       });
   }
 
@@ -97,47 +102,73 @@ class App extends Component {
         };
       });
   }
-  
+
   callAPI_history(){
-    
+
     axios.post(API_URL_2,({
       timestamp_in:(this.state.date_in).getTime(),
       timestamp_fin:(this.state.date_fin).getTime(),
       ID:((this.state.ID).value)
     }))
 
-      .then((res) => { 
-        var buff = (res.data); 
+      .then((res) => {
+        var buff = (res.data);
         this.setState({
           history:buff
         });
       });
-    
+
+  }
+
+  callAPI_trace(){
+
+    axios.post(API_URL_4,({
+      trace_init:(this.state.trace_init).getTime(),
+      trace_actual:(new Date()).getTime(),
+      ID:((this.state.ID).value)
+    }))
+
+    .then((res) => {
+      var buff = (res.data);
+      this.setState({
+        trace:buff
+      });
+    });
+
   }
 
   set_timer1(){
-    this.timer1 = setInterval(()=>{this.callAPI_actual()}, 1000);
+    this.timer1 = setInterval(() => {this.callAPI_actual()}, 1000);
   }
 
   set_timer2(){
-    this.timer2 = setInterval(()=>{this.callAPI_history()},1000);
+    this.timer2 = setInterval(() => {this.callAPI_history()},1000);
+  }
+
+  set_timer3(){
+    this.timer3 = setInterval(() => {this.callAPI_trace()},1000);
   }
 
   componentDidMount(){
     console.log("Al components mounted");
     this.callAPI_users();
     this.set_timer1();
+    this.setState({
+      trace_init:new Date()
+    });
+    this.set_timer3();
   }
 
   render(){return (
-    
+
     <div>
 
     <title>GPS<span role="img" aria-label="Satellite Antenna">📡</span></title>
 
     <div style={{position:'absolute',top:'50%',left:'-1%',zIndex:'15'}}>
       <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'white'}}>
-      <span role="img" aria-label="Right arrow"> Advance ➡️</span></Button>
+      <span role="img" aria-label="Right arrow"> Advance ➡️</span>
+      </Button>
     </div>
 
     <div style={{position:"absolute",top:"1%",left:"1%",width:"30%",height:"25%",backgroundColor:"white",zIndex:5}}>
@@ -185,14 +216,19 @@ class App extends Component {
           onChange={(checked)=>{
             if(checked){
               this.set_timer1();
+              this.set_timer3();
               this.setState({
-                sw_tag:true
+                trace_init:new Date(),
+                sw_tag:true,
+                sw_trace:true
               });
             }else{
               clearInterval(this.timer1);
+              clearInterval(this.timer3);
               this.setState({
                 coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
-                sw_tag:false
+                sw_tag:false,
+                sw_trace:false
               });
             }
             this.setState({
@@ -223,7 +259,7 @@ class App extends Component {
               sw_history:checked
             })
           }}
-      /> 
+      />
     </div>
 
     <h5 style={{position:"absolute",top:"17%",left:"2%",zIndex:"10"}}>Initial date: </h5>
@@ -251,14 +287,15 @@ class App extends Component {
     <h5 style={{position:"absolute",top:"39%",left:"2%",zIndex:"10"}}>Bus number: </h5>
 
     <div style={{position:"absolute",top:"46%",left:"2%",zIndex:"10",width:"25%"}}>
-      <Select 
-        options={this.state.Opt} 
+      <Select
+        options={this.state.Opt}
         //isMulti
         isDisabled={false}
         value={this.state.ID}
         onChange={(value)=>{
           this.setState({
-            ID:value
+            ID:value,
+            trace_init:new Date()
           });
         }}
       />
@@ -270,11 +307,11 @@ class App extends Component {
     <LoadScript
        googleMapsApiKey={API_KEY}>
 
-    <GoogleMap 
-    mapContainerStyle={mapContainerStyle} 
-    zoom={8} center={center} 
+    <GoogleMap
+    mapContainerStyle={mapContainerStyle}
+    zoom={8} center={center}
     options={options}
-    > 
+    >
 
     <Polyline
       visible={this.state.sw_history}
@@ -283,7 +320,15 @@ class App extends Component {
         strokeColor:'#ff0000',
       }}
     />
-    
+
+    <Polyline
+      visible={this.state.sw_trace}
+      path={this.state.trace}
+      options={{
+        strokeColor:'#140852',
+      }}
+    />
+
     <Marker
       position={this.state.coord}
       icon={"/truck.svg"}
@@ -310,6 +355,9 @@ class App extends Component {
     </div>
 
   );
+
 }
+
 }
+
 export default App;

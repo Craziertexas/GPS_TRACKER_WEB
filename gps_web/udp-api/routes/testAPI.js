@@ -71,7 +71,7 @@ function Updatetable(message){
 }
 
 function Getusers(){
-  
+
   return new Promise((resolve,reject)=>{
     con.query(("SELECT DISTINCT truck FROM gps;"),
       function(err,result){
@@ -91,7 +91,7 @@ function GetLast(truck){
         var lastposition=JSON.parse(JSON.stringify(result));
         return err ? reject(err): resolve(lastposition);
       }
-    ); 
+    );
   });
 
 }
@@ -107,6 +107,18 @@ function Gethistory(truck,time_in,time_fin){
     );
   });
 
+}
+
+function GetTrace(truck, trace_init, trace_actual){
+  return new Promise((resolve, reject) => {
+    con.query((("SELECT lat,lng FROM gps WHERE truck = ").concat((truck).toString()," AND timegps BETWEEN ",(trace_init).toString(),' and ',(trace_actual).toString())),
+      function (err, result){
+        if (err){throw err};
+        var trace = JSON.parse(JSON.stringify(result));
+        return err ? reject(err): resolve(trace);
+      }
+    );
+  });
 }
 
 var server= udp.createSocket('udp4');
@@ -126,7 +138,7 @@ server.on('listening',function(){
 });
 
 server.on('message',function(msg,info){
-  
+
   try{
     var message=msg.toString();
     async function Update(){
@@ -150,7 +162,7 @@ router.get("/users", function(req, res, next) {
   }catch(error){
     console.error();
   }
-  
+
 });
 
 router.post("/history", function(req, res, next) {
@@ -167,13 +179,30 @@ router.post("/history", function(req, res, next) {
   }catch(error){
     console.error();
   }
-  
+
+});
+
+router.post("/trace", function (req, res, next){
+
+  try{
+    var truck = req.body.ID;
+    var trace_init = req.body.trace_init;
+    var trace_actual = req.body.trace_actual;
+    async function Trace(){
+      var trace = await GetTrace(truck,trace_init,trace_actual);
+      res.json(trace);
+    }
+    Trace()
+  }catch(error){
+    console.error();
+  }
+
 });
 
 router.post("/last", function(req,res, next){
 
   try{
-    var truck=req.body.ID; 
+    var truck=req.body.ID;
     async function Last(){
       var last=await GetLast(truck);
       res.json(last);
@@ -182,7 +211,7 @@ router.post("/last", function(req,res, next){
   }catch(error){
     console.error();
   }
-  
+
 });
 
 module.exports = router;
