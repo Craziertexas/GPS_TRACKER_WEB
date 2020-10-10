@@ -43,8 +43,7 @@ class App extends Component {
     this.state={
       coord:{
         lat:10.9878,
-        lng:-74.7889 }
-      ,
+        lng:-74.7889 },
       lat:8.75,
       lng:-75.883,
       coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
@@ -61,7 +60,7 @@ class App extends Component {
       sw_trace:true,
       trace:[],
       trace_init:new Date(),
-    }
+    };
 
   }
 
@@ -69,7 +68,7 @@ class App extends Component {
     axios.get(API_URL_3)
       .then((res)=>{
         for (var i=0; i<((res.data).length); i++){
-          this.state.Opt.push({value:(((res.data)[i]).truck), label:("Camion ").concat((((res.data)[i]).truck).toString())})
+          this.state.Opt.push({value:(((res.data)[i]).truck), label:("Camion ").concat((((res.data)[i]).truck).toString())});
         }
       });
   }
@@ -99,7 +98,7 @@ class App extends Component {
           });
         }catch(error){
           console.log(Error);
-        };
+        }
       });
   }
 
@@ -138,15 +137,15 @@ class App extends Component {
   }
 
   set_timer1(){
-    this.timer1 = setInterval(() => {this.callAPI_actual()}, 1000);
+    this.timer1 = setInterval(() => {this.callAPI_actual();}, 1000);
   }
 
   set_timer2(){
-    this.timer2 = setInterval(() => {this.callAPI_history()},1000);
+    this.timer2 = setInterval(() => {this.callAPI_history();},1000);
   }
 
   set_timer3(){
-    this.timer3 = setInterval(() => {this.callAPI_trace()},1000);
+    this.timer3 = setInterval(() => {this.callAPI_trace();},1000);
   }
 
   componentDidMount(){
