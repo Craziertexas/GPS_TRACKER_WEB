@@ -1,5 +1,5 @@
 import React, { Component} from 'react';
-import {GoogleMap,Marker, LoadScript, Polyline} from "@react-google-maps/api";
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, InfoWindow, OverlayView} from "@react-google-maps/api";
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -18,14 +18,11 @@ const API_URL_3 = process.env.REACT_APP_API_URL_3;
 
 const API_URL_4 = process.env.REACT_APP_API_URL_4;
 
+const API_URL_5 = process.env.REACT_APP_API_URL_5;
+
 const mapContainerStyle = {
   width: "100vw",
   height: "100vh",
-};
-
-const center={
-  lat:10.9878,
-  lng:-74.7889 ,
 };
 
 const options={
@@ -35,21 +32,66 @@ const options={
   streetViewControl: true,
 };
 
+const searchBoxStyle={
+  boxSizing: `border-box`,
+  border: `1px solid transparent`,
+  width: `30%`,
+  height: `6%`,
+  padding: `0 12px`,
+  borderRadius: `3px`,
+  boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+  fontSize: `14px`,
+  outline: `none`,
+  textOverflow: `ellipses`,
+  position: "absolute",
+  left: "50%",
+  top: "2%",
+  marginLeft: "-120px"
+}
+
+const libraries=["places"]
+
+//By: https://www.geodatasource.com/developers/javascript
+function distance(lat1, lon1, lat2, lon2, unit) {
+	if ((lat1 == lat2) && (lon1 == lon2)) {
+		return 0;
+	}
+	else {
+		var radlat1 = Math.PI * lat1/180;
+		var radlat2 = Math.PI * lat2/180;
+		var theta = lon1-lon2;
+		var radtheta = Math.PI * theta/180;
+		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+		if (dist > 1) {
+			dist = 1;
+		}
+		dist = Math.acos(dist);
+		dist = dist * 180/Math.PI;
+		dist = dist * 60 * 1.1515;
+		if (unit=="K") { dist = dist * 1.609344 }
+		if (unit=="N") { dist = dist * 0.8684 }
+		return dist;
+	}
+}
 
 class App extends Component {
 
   constructor(){
     super();
     this.state={
+      center:{
+        lat:10.9878,
+        lng:-74.7889},
       coord:{
         lat:10.9878,
         lng:-74.7889 },
-      lat:8.75,
-      lng:-75.883,
       coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
       sw_realtime:true,
       sw_history:false,
       history:[],
+      history_filter:{
+        lat:0,
+        lng:0},
       date_in:new Date(),
       date_fin:new Date(),
       openPanel:false,
@@ -60,6 +102,12 @@ class App extends Component {
       sw_trace:true,
       trace:[],
       trace_init:new Date(),
+      Infotime:0,
+      Infoposition:{
+        lat:0,
+        lng:0
+      },
+      sw_info_tag:false,
     };
 
   }
@@ -79,7 +127,6 @@ class App extends Component {
       ID:((this.state.ID).value)
     }))
       .then((res) => {
-        console.log(res.data);
         try{
           this.setState({
             coord:{
@@ -133,6 +180,39 @@ class App extends Component {
         trace:buff
       });
     });
+
+  }
+
+  callAPI_infohistory(){
+
+    var distance_buff = 9999999999; 
+    var history_filtered = {lat:0,lng:0}
+
+    for (var i = 0 ; i<=((this.state.history).length - 1) ; i++){
+      var distance_calc = distance((this.state.history_filter).lat,(this.state.history_filter).lng,(this.state.history[i]).lat,(this.state.history[i]).lng,'K')
+      if (distance_calc<distance_buff) {
+        distance_buff=distance_calc
+        history_filtered.lat=(this.state.history[i]).lat
+        history_filtered.lng=(this.state.history[i]).lng
+      }
+    }
+
+    axios.post(API_URL_5,({
+      position:history_filtered,
+      timestamp_in:(this.state.date_in).getTime(),
+      timestamp_fin:(this.state.date_fin).getTime(),
+      ID:((this.state.ID).value)
+    }))
+
+    .then((res) => {
+      var buff = (res.data);
+      console.log(buff[0].timegps);
+      this.setState({
+        Infotime:buff[0].timegps,
+        Infoposition:history_filtered,
+        sw_info_tag:true
+      })
+    })
 
   }
 
@@ -304,11 +384,13 @@ class App extends Component {
 
     <div>
     <LoadScript
-       googleMapsApiKey={API_KEY}>
-
+       googleMapsApiKey={API_KEY}
+       libraries={libraries}
+    >
+      
     <GoogleMap
     mapContainerStyle={mapContainerStyle}
-    zoom={8} center={center}
+    zoom={15} center={this.state.center}
     options={options}
     >
 
@@ -318,6 +400,15 @@ class App extends Component {
       options={{
         strokeColor:'#ff0000',
       }}
+      onClick={(e) => {
+        this.setState({
+          history_filter:{
+            lat:e.latLng.lat(),
+            lng:e.latLng.lng()
+          }
+        });
+        this.callAPI_infohistory();
+      }}
     />
 
     <Polyline
@@ -325,6 +416,9 @@ class App extends Component {
       path={this.state.trace}
       options={{
         strokeColor:'#140852',
+      }}
+      onClick={(funtion) => {
+        console.log(funtion())
       }}
     />
 
@@ -345,6 +439,42 @@ class App extends Component {
       icon={"/ubicacion.svg"}
       visible={this.state.sw_his_tag}
     />
+
+    <StandaloneSearchBox
+      onLoad={(ref)=>{this.searchBox = ref}}
+      onPlacesChanged={()=>{
+        this.setState({
+          center:{
+            lat:((((this.searchBox.getPlaces())[0]).geometry).location).lat(),
+            lng:((((this.searchBox.getPlaces())[0]).geometry).location).lng()
+          }
+        });
+      }}
+    >
+
+      <input
+        type="text"
+        placeholder="Search Places"
+        style={searchBoxStyle}
+      />
+
+    </StandaloneSearchBox>
+    
+    <Marker
+      position={this.state.Infoposition}
+      onDblClick={()=>this.setState({sw_info_tag:false})}
+      visible={this.state.sw_info_tag}>
+        
+      <OverlayView 
+        position={this.state.Infoposition}
+        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+      >
+      <div style={{width:'5%'}}>
+      <h4>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+      </div> 
+      </OverlayView>
+
+    </Marker>
 
     </GoogleMap>
 

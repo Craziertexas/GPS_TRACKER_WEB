@@ -109,6 +109,18 @@ function Gethistory(truck,time_in,time_fin){
 
 }
 
+function GetInfo(time_in,time_fin,truck,position){
+  return new Promise((resolve,reject)=>{
+    con.query((("SELECT timegps FROM gps WHERE truck = ").concat((truck).toString()," AND lat = ",(position.lat).toString()," AND lng = ",(position.lng).toString()," AND timegps BETWEEN ",(time_in).toString()," and ",(time_fin).toString())),
+      function(err,result){
+        if(err){throw err};
+        var info=JSON.parse(JSON.stringify(result));
+        return err ? reject(err): resolve(info)
+      }
+    );
+  });
+}
+
 function GetTrace(truck, trace_init, trace_actual){
   return new Promise((resolve, reject) => {
     con.query((("SELECT lat,lng FROM gps WHERE truck = ").concat((truck).toString()," AND timegps BETWEEN ",(trace_init).toString(),' and ',(trace_actual).toString())),
@@ -181,6 +193,23 @@ router.post("/history", function(req, res, next) {
   }
 
 });
+
+router.post("/history/info", function(req, res, next) {
+  console.log("INFOOOOOOOOOOOOOOOOOOO");
+  try{
+    var time_in=req.body.timestamp_in;
+    var time_fin=req.body.timestamp_fin;
+    var truck=req.body.ID;
+    var position=req.body.position;
+    async function Info() {
+      var info = await GetInfo(time_in,time_fin,truck,position);
+      res.json(info);  
+    }
+    Info();
+  }catch(error){
+    console.error();
+  }
+})
 
 router.post("/trace", function (req, res, next){
 
