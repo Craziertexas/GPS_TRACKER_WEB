@@ -417,9 +417,6 @@ class App extends Component {
       options={{
         strokeColor:'#140852',
       }}
-      onClick={(funtion) => {
-        console.log(funtion())
-      }}
     />
 
     <Marker
