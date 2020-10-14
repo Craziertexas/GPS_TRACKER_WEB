@@ -239,158 +239,127 @@ class App extends Component {
   }
 
   render(){return (
-
-    <div>
-
-    <title>GPS<span role="img" aria-label="Satellite Antenna">📡</span></title>
-
-    <div style={{position:'absolute',top:'50%',left:'-1%',zIndex:'15'}}>
-      <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'white'}}>
-      <span role="img" aria-label="Right arrow"> Advance ➡️</span>
-      </Button>
+    <div class="Contenedor">
+    <title>GPS TIO RICO</title>
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
+    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#29c296',cursor:'pointer'}}>⋙</Button>
     </div>
-
-    <div style={{position:"absolute",top:"1%",left:"1%",width:"30%",height:"25%",backgroundColor:"white",zIndex:5}}>
-    </div>
-
-    <div>
-    <h1 style={{top:"2%",left:"2%"}}>
-      GPS Tio Rico <span role="img" aria-label="Satellite Antenna">📡</span>
-    </h1>
-    <h4 style={{top:"10%",left:"2%"}}>
-    <body>{"Latitude: "+this.state.coord_text.lat}</body>
-    </h4>
-    <h4 style={{top:"13.5%",left:"2%"}}>
-    <body>{"Longitude: "+this.state.coord_text.lng}</body>
-    </h4>
-    <h4 style={{top:"17%",left:"2%"}}>
-    <body>{"Altitude: "+this.state.coord_text.alt}</body>
-    </h4>
-    <h4 style={{top:"20.5%",left:"2%"}}>
-    <body>{"Timestamp: "+(((new Date(parseFloat(this.state.coord_text.time,10))) + "").split("("))[0]}</body>
-    </h4>
-    </div>
-
+    
     <SlidingPanel
-      type={'left'}
-      isOpen={this.state.openPanel}
-      size={30}
-      style={{zIndex:7}}
+        type={'left'}
+        isOpen={this.state.openPanel}
+        size={30}
+        style={{zIndex:'7'}}
     >
-
-    <div style={{position:'absolute',top:"50%",left:"31%",zIndex:"15"}}>
-      <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'white'}}>
-      <span role="img" aria-label="Left arrow">⬅️</span>
-      </Button>
+    <div style={{zIndex:'10', position:"absolute", top:"0%", left:"0%", backgroundColor:"white",width:"40%",height:"100%"}}></div>
+    <div style={{zIndex:'10', position:"absolute", top:"5%", left:"40%"}}>
+    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#29c296', cursor:'pointer'}}>⋘</Button>
     </div>
-
-    <div style={{position:'absolute',top:'0px',left:'0px',zIndex:'5',width:'32%',height:'100%',backgroundColor:'white'}}>
-    </div>
-
-    <h5 style={{top:"5%",left:"2%",zIndex:"10",position:"absolute"}}>Real time position:</h5>
-
-    <div style={{position:'absolute',top:"7.5%",left:"11.5%",zIndex:"10"}}>
-    <Switch
-          checked={this.state.sw_realtime}
-          onChange={(checked)=>{
-            if(checked){
-              this.set_timer1();
-              this.set_timer3();
-              this.setState({
-                trace_init:new Date(),
-                sw_tag:true,
-                sw_trace:true
-              });
-            }else{
-              clearInterval(this.timer1);
-              clearInterval(this.timer3);
-              this.setState({
-                coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
-                sw_tag:false,
-                sw_trace:false
-              });
-            }
-            this.setState({
-              sw_realtime:checked
-            });
-          }}
-    />
-    </div>
-
-    <h5 style={{top:"10%",left:"2%",zIndex:"10",position:"absolute"}}>Show history:</h5>
-
-    <div style={{position:"absolute",top:"12.5%",left:"11.5%",zIndex:"10"}}>
-    <Switch
-          checked={this.state.sw_history}
-          onChange={(checked)=>{
-            if(checked){
-              this.set_timer2();
-              this.setState({
-                sw_his_tag:true
-              });
-            }else{
-              clearInterval(this.timer2);
-              this.setState({
-                sw_his_tag:false
-              });
-            }
-            this.setState({
-              sw_history:checked
-            })
-          }}
-      />
-    </div>
-
-    <h5 style={{position:"absolute",top:"17%",left:"2%",zIndex:"10"}}>Initial date: </h5>
-
-    <div style={{position:"absolute",top:"24%",left:"2%",zIndex:"12"}}>
-      <DateTimePicker
+    
+    
+      <h1>
+        <body style={{top:"5%", textAlign:'center', fontSize:'30px',marginBottom:'5%'}}>GPS Tio Rico <span role="img" aria-label="Satellite Antenna">📡</span> </body>
+        <body style={{textAlign:'left', fontSize:'20px'}}>{"Latitude: "+this.state.coord_text.lat}</body>
+        <body style={{textAlign:'left', fontSize:'20px'}}>{"Longitude: "+this.state.coord_text.lng}</body>
+        <body style={{textAlign:'left', fontSize:'20px'}}>{"Altitude: "+this.state.coord_text.alt}</body>
+        <body style={{textAlign:'left', fontSize:'20px', marginBottom:'10%'}}>{"Timestamp: "+(new Date(parseFloat(this.state.coord_text.time,10)))}</body>
+        <body style={{fontSize:'20px' ,padding: "1px", float: "left", width: "47%", textAlign: "center", marginBottom: '1%'}}>Initial date</body>
+        <body style={{fontSize:'20px', padding: "1px",float: "right", width: "47%", textAlign: "center",marginBottom: '1%'}}>Final date</body>
+        <body style={{float:'left',width:'47%', textAling:'center',marginBottom:'10%'}}>
+        <DateTimePicker
         returnValue={'start'}
         onChange={(value) => this.setState({date_in: value})}
         value={this.state.date_in}
         maxDate={this.state.date_fin}
-      />
-    </div>
-
-    <h5 style={{position:'absolute',top:"26%",left:"2%",zIndex:"10"}}>Final date: </h5>
-
-    <div style={{position:'absolute',top:"33%",left:"2%",zIndex:"11"}}>
-      <DateTimePicker
+        />
+        </body>
+        <body style={{float:'right',width:'47%', textAling:'center',marginBottom:'10%'}}>
+        <DateTimePicker
         returnValue={'start'}
         onChange={(value) => this.setState({date_fin: value})}
         value={this.state.date_fin}
         minDate={this.state.date_in}
-      />
-    </div>
+        />
+        </body>
+        <body style={{textAlign:'left', fontSize:'20px'}}>Escoger camión</body>
+        <body style={{padding: "1px",textAlign:'center',marginBottom:'10%'}}> 
+          <Select 
+            options={this.state.Opt}
+            //isMulti
+            isDisabled={false}
+            value={this.state.ID}
+            onChange={(value)=>{
+              this.setState({
+              ID:value,
+              trace_init:new Date()
+              });
+            }}
+          />
+        </body>
+        <body style={{fontSize:'20px' ,padding: "1px", float: "left", width: "40%",marginBottom: '1%',textAlign:'center'}}>Show History</body>
+        <body style={{fontSize:'20px' ,padding: "1px", float: "right", width: "40%", textAlign: "center", marginBottom: '1%'}}>Real Time</body>
+        <body style={{fontSize:'20px' ,padding: "1px", float: "left", width: "40%",marginBottom: '1%',textAlign:'center'}}>  
+          <Switch
+              checked={this.state.sw_history}
+              onChange={(checked)=>{
+                if(checked){
+                  this.set_timer2();
+                  this.setState({
+                    sw_his_tag:true
+                  });
+                }else{
+                  clearInterval(this.timer2);
+                  this.setState({
+                  sw_his_tag:false
+                  });
+                }
+                this.setState({
+                  sw_history:checked
+                })
+              }}
+            /> 
+        </body>
 
-    <h5 style={{position:"absolute",top:"39%",left:"2%",zIndex:"10"}}>Bus number: </h5>
-
-    <div style={{position:"absolute",top:"46%",left:"2%",zIndex:"10",width:"25%"}}>
-      <Select
-        options={this.state.Opt}
-        //isMulti
-        isDisabled={false}
-        value={this.state.ID}
-        onChange={(value)=>{
-          this.setState({
-            ID:value,
-            trace_init:new Date()
-          });
-        }}
-      />
-    </div>
-
+        <body style={{fontSize:'20px' ,padding: "1px", float: "right", width: "40%",marginBottom: '1%',textAlign:'center'}}>  
+          <Switch
+              checked={this.state.sw_realtime}
+              onChange={(checked)=>{
+                if(checked){
+                  this.set_timer1();
+		              this.set_timer3();
+                  this.setState({
+                    trace_init:new Date(),
+                    sw_tag:true,
+                    sw_trace:true
+                  });
+                }else{
+                  clearInterval(this.timer1);
+                  clearInterval(this.timer3);
+                  this.setState({
+                  coord_text:{lng:"XXXX",lat:"XXXX",alt:"XXXX",time:"0000"},
+                  sw_tag:false,
+                  sw_trace:false
+                  });
+                }
+                this.setState({
+                  sw_realtime:checked
+                })
+              }}
+            /> 
+        </body>
+       
+      </h1>    
+ 
     </SlidingPanel>
-
-    <div>
+  
     <LoadScript
        googleMapsApiKey={API_KEY}
        libraries={libraries}
     >
-      
-    <GoogleMap
-    mapContainerStyle={mapContainerStyle}
-    zoom={15} center={this.state.center}
+       
+    <GoogleMap 
+    mapContainerStyle={mapContainerStyle} 
+    zoom={15} center={this.state.center} 
     options={options}
     >
 
@@ -398,7 +367,7 @@ class App extends Component {
       visible={this.state.sw_history}
       path={this.state.history}
       options={{
-        strokeColor:'#ff0000',
+        strokeColor: '#ff0000',
       }}
       onClick={(e) => {
         this.setState({
@@ -418,22 +387,22 @@ class App extends Component {
         strokeColor:'#140852',
       }}
     />
-
+ 
     <Marker
       position={this.state.coord}
       icon={"/truck.svg"}
       visible={this.state.sw_tag}
+    />  
+
+    <Marker
+      position={this.state.history[0]}
+      icon={"/ubicacion.svg"}
+      visible={this.state.sw_his_tag}
     />
 
     <Marker
       position={this.state.history[(this.state.history.length-1)]}
       icon={"/mapa.svg"}
-      visible={this.state.sw_his_tag}
-    />
-
-    <Marker
-      position={this.state.history[0]}
-      icon={"/ubicacion.svg"}
       visible={this.state.sw_his_tag}
     />
 
@@ -456,7 +425,7 @@ class App extends Component {
       />
 
     </StandaloneSearchBox>
-    
+
     <Marker
       position={this.state.Infoposition}
       onDblClick={()=>this.setState({sw_info_tag:false})}
@@ -472,14 +441,11 @@ class App extends Component {
       </OverlayView>
 
     </Marker>
-
+    
     </GoogleMap>
 
     </LoadScript>
     </div>
-
-    </div>
-
   );
 
 }
