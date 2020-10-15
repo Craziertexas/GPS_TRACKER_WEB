@@ -242,7 +242,7 @@ class App extends Component {
     <div class="Contenedor">
     <title>GPS TIO RICO</title>
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
-    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#29c296',cursor:'pointer'}}>⋙</Button>
+    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
     
     <SlidingPanel
@@ -253,7 +253,7 @@ class App extends Component {
     >
     <div style={{zIndex:'10', position:"absolute", top:"0%", left:"0%", backgroundColor:"white",width:"40%",height:"100%"}}></div>
     <div style={{zIndex:'10', position:"absolute", top:"5%", left:"40%"}}>
-    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#29c296', cursor:'pointer'}}>⋘</Button>
+    <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc', cursor:'pointer'}}>⋘</Button>
     </div>
     
     
@@ -300,6 +300,7 @@ class App extends Component {
         <body style={{fontSize:'20px' ,padding: "1px", float: "right", width: "40%", textAlign: "center", marginBottom: '1%'}}>Real Time</body>
         <body style={{fontSize:'20px' ,padding: "1px", float: "left", width: "40%",marginBottom: '1%',textAlign:'center'}}>  
           <Switch
+              onColor={'#03b1fc'}
               checked={this.state.sw_history}
               onChange={(checked)=>{
                 if(checked){
