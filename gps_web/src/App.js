@@ -1,5 +1,5 @@
 import React, { Component} from 'react';
-import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, InfoWindow, OverlayView} from "@react-google-maps/api";
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, OverlayView} from "@react-google-maps/api";
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -55,7 +55,7 @@ const libraries=["places"]
 
 //By: https://www.geodatasource.com/developers/javascript
 function distance(lat1, lon1, lat2, lon2, unit) {
-	if ((lat1 == lat2) && (lon1 == lon2)) {
+	if ((lat1 === lat2) && (lon1 === lon2)) {
 		return 0;
 	}
 	else {
@@ -70,8 +70,8 @@ function distance(lat1, lon1, lat2, lon2, unit) {
 		dist = Math.acos(dist);
 		dist = dist * 180/Math.PI;
 		dist = dist * 60 * 1.1515;
-		if (unit=="K") { dist = dist * 1.609344 }
-		if (unit=="N") { dist = dist * 0.8684 }
+		if (unit==="K") { dist = dist * 1.609344 }
+		if (unit==="N") { dist = dist * 0.8684 }
 		return dist;
 	}
 }
@@ -84,6 +84,7 @@ class App extends Component {
       center:{
         lat:10.9878,
         lng:-74.7889},
+      sw_center:true,
       coord:{
         lat:10.9878,
         lng:-74.7889 },
@@ -141,10 +142,18 @@ class App extends Component {
           var buff_lng=(res.data[0].lng).toString();
           var buff_time=(res.data[0].timegps).toString();
           var buff_alt=(res.data[0].alt).toString();
+          console.log(this.state.sw_center);
+          if (this.state.sw_center){
+            this.setState({
+              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time},
+              center:{lng:parseFloat(buff_lng),lat:parseFloat(buff_lat)}
+            });
+          }else{
+            this.setState({
+              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
+            });
+          }
 
-          this.setState({
-            coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
-          });
         }catch(error){
           console.log(Error);
         }
@@ -246,7 +255,9 @@ class App extends Component {
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#29c296',cursor:'pointer'}}>⋙</Button>
     </div>
-    
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"96%"}}>
+    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}><span role="img" aria-label="Onlocation">📍</span></Button>
+    </div>
     <SlidingPanel
         type={'left'}
         isOpen={this.state.openPanel}
@@ -370,6 +381,7 @@ class App extends Component {
       path={this.state.history}
       options={{
         strokeColor: '#ff0000',
+        strokeWeight: 4
       }}
       onClick={(e) => {
         this.setState({
