@@ -255,8 +255,8 @@ class App extends Component {
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
-    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"96%"}}>
-    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}><span role="img" aria-label="Onlocation">📍</span></Button>
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%"}}>
+    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}> Follow Truck <span role="img" aria-label="Onlocation">📍</span></Button>
     </div>
     <SlidingPanel
         type={'left'}
@@ -449,9 +449,10 @@ class App extends Component {
       <OverlayView 
         position={this.state.Infoposition}
         mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+        visible={false}
       >
-      <div style={{width:'5%'}}>
-      <h4>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+      <div style={{position:'absolute',background:'white',zIndex:'100'}}>
+      <h4>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</h4>
       </div> 
       </OverlayView>
 
