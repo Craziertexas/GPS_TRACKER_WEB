@@ -1,5 +1,5 @@
 import React, { Component} from 'react';
-import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, InfoWindow, OverlayView} from "@react-google-maps/api";
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox} from "@react-google-maps/api";
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -44,7 +44,7 @@ const searchBoxStyle={
   outline: `none`,
   textOverflow: `ellipses`,
   position: "absolute",
-  left: "50%",
+  left: "48%",
   top: "2%",
   marginLeft: "-120px"
 }
@@ -53,7 +53,7 @@ const libraries=["places"]
 
 //By: https://www.geodatasource.com/developers/javascript
 function distance(lat1, lon1, lat2, lon2, unit) {
-	if ((lat1 == lat2) && (lon1 == lon2)) {
+	if ((lat1 === lat2) && (lon1 === lon2)) {
 		return 0;
 	}
 	else {
@@ -68,8 +68,8 @@ function distance(lat1, lon1, lat2, lon2, unit) {
 		dist = Math.acos(dist);
 		dist = dist * 180/Math.PI;
 		dist = dist * 60 * 1.1515;
-		if (unit=="K") { dist = dist * 1.609344 }
-		if (unit=="N") { dist = dist * 0.8684 }
+		if (unit==="K") { dist = dist * 1.609344 }
+		if (unit==="N") { dist = dist * 0.8684 }
 		return dist;
 	}
 }
@@ -82,6 +82,7 @@ class App extends Component {
       center:{
         lat:10.9878,
         lng:-74.7889},
+      sw_center:true,
       coord:{
         lat:10.9878,
         lng:-74.7889 },
@@ -108,6 +109,7 @@ class App extends Component {
         lng:0
       },
       sw_info_tag:false,
+      Isopen:'hidden'
     };
 
   }
@@ -139,10 +141,18 @@ class App extends Component {
           var buff_lng=(res.data[0].lng).toString();
           var buff_time=(res.data[0].timegps).toString();
           var buff_alt=(res.data[0].alt).toString();
+          console.log(this.state.sw_center);
+          if (this.state.sw_center){
+            this.setState({
+              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time},
+              center:{lng:parseFloat(buff_lng),lat:parseFloat(buff_lat)}
+            });
+          }else{
+            this.setState({
+              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
+            });
+          }
 
-          this.setState({
-            coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
-          });
         }catch(error){
           console.log(Error);
         }
@@ -244,7 +254,10 @@ class App extends Component {
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
-    
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%",border:"3px solid #54bfbc"}}>
+    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}>Follow truck  <span role="img" aria-label="Onlocation">📍</span></Button>
+    </div>
+
     <SlidingPanel
         type={'left'}
         isOpen={this.state.openPanel}
@@ -369,6 +382,7 @@ class App extends Component {
       path={this.state.history}
       options={{
         strokeColor: '#ff0000',
+        strokeWeight: 4
       }}
       onClick={(e) => {
         this.setState({
@@ -378,6 +392,11 @@ class App extends Component {
           }
         });
         this.callAPI_infohistory();
+        if (this.state.Isopen ==='hidden'){
+          this.setState({
+            Isopen:'visible'
+          })
+        }
       }}
     />
 
@@ -398,8 +417,8 @@ class App extends Component {
     <Marker
       position={this.state.history[0]}
       icon={"/ubicacion.svg"}
-      visible={this.state.sw_his_tag}
-    />
+      visible={this.state.sw_his_tag}>
+    </Marker>
 
     <Marker
       position={this.state.history[(this.state.history.length-1)]}
@@ -429,23 +448,23 @@ class App extends Component {
 
     <Marker
       position={this.state.Infoposition}
-      onDblClick={()=>this.setState({sw_info_tag:false})}
+      onDblClick={()=>{
+        this.setState({sw_info_tag:false})
+        if (this.state.Isopen === 'visible'){
+          this.setState({
+            Isopen:'hidden'
+          })
+        }
+      }}
       visible={this.state.sw_info_tag}>
-        
-      <OverlayView 
-        position={this.state.Infoposition}
-        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-      >
-      <div style={{width:'5%'}}>
-      <h4>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
-      </div> 
-      </OverlayView>
-
     </Marker>
     
     </GoogleMap>
 
     </LoadScript>
+    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen,border:"3px solid #ff0000"}}>
+      <h4 style={{left:'4%',backgroundColor:'white',width:'95%',background:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+    </div>
     </div>
   );
 
