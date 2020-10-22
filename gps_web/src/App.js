@@ -1,5 +1,6 @@
 import React, { Component} from 'react';
-import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, OverlayView} from "@react-google-maps/api";
+import ReactDOM from 'react-dom';
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, OverlayView, InfoWindow} from "@react-google-maps/api";
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -7,8 +8,6 @@ import DateTimePicker from 'react-datetime-picker';
 import Switch from "react-switch";
 import SlidingPanel from 'react-sliding-side-panel';
 import Select from 'react-select';
-
-//test
 
 const API_KEY = process.env.REACT_APP_MAPS_API;
 
@@ -111,6 +110,7 @@ class App extends Component {
         lng:0
       },
       sw_info_tag:false,
+      Isopen:'hidden'
     };
 
   }
@@ -392,6 +392,11 @@ class App extends Component {
           }
         });
         this.callAPI_infohistory();
+        if (this.state.Isopen ==='hidden'){
+          this.setState({
+            Isopen:'visible'
+          })
+        }
       }}
     />
 
@@ -412,8 +417,8 @@ class App extends Component {
     <Marker
       position={this.state.history[0]}
       icon={"/ubicacion.svg"}
-      visible={this.state.sw_his_tag}
-    />
+      visible={this.state.sw_his_tag}>
+    </Marker>
 
     <Marker
       position={this.state.history[(this.state.history.length-1)]}
@@ -443,24 +448,23 @@ class App extends Component {
 
     <Marker
       position={this.state.Infoposition}
-      onDblClick={()=>this.setState({sw_info_tag:false})}
+      onDblClick={()=>{
+        this.setState({sw_info_tag:false})
+        if (this.state.Isopen === 'visible'){
+          this.setState({
+            Isopen:'hidden'
+          })
+        }
+      }}
       visible={this.state.sw_info_tag}>
-        
-      <OverlayView 
-        position={this.state.Infoposition}
-        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-        visible={false}
-      >
-      <div style={{position:'absolute',background:'white',zIndex:'100'}}>
-      <h4>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</h4>
-      </div> 
-      </OverlayView>
-
     </Marker>
     
     </GoogleMap>
 
     </LoadScript>
+    <div style={{left:'80%',top:'20%',position:'absolute',width:'30%',height:'10%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen}}>
+      <h4 style={{backgroundColor:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+    </div>
     </div>
   );
 
