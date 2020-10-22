@@ -44,9 +44,9 @@ const searchBoxStyle={
   outline: `none`,
   textOverflow: `ellipses`,
   position: "absolute",
-  left: "50%",
-  top: "2%",
-  marginLeft: "-120px"
+  left: '48%',
+  top: '2%',
+  marginLeft: '-120px'
 }
 
 const libraries=["places"]
@@ -254,8 +254,8 @@ class App extends Component {
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
-    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%"}}>
-    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}> Follow Truck <span role="img" aria-label="Onlocation">📍</span></Button>
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%",border:"3px solid #54bfbc"}}>
+    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}>Follow truck  <span role="img" aria-label="Onlocation">📍</span></Button>
     </div>
     <SlidingPanel
         type={'left'}
@@ -461,8 +461,8 @@ class App extends Component {
     </GoogleMap>
 
     </LoadScript>
-    <div style={{left:'80%',top:'20%',position:'absolute',width:'30%',height:'10%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen}}>
-      <h4 style={{backgroundColor:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen,border:"3px solid #ff0000"}}>
+      <h4 style={{left:'4%',backgroundColor:'white',width:'95%',background:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
     </div>
     </div>
   );
