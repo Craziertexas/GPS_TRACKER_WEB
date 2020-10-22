@@ -3,6 +3,7 @@ import React, { Component} from 'react';
 import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox} from "@react-google-maps/api";
 =======
 import ReactDOM from 'react-dom';
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, OverlayView, InfoWindow} from "@react-google-maps/api";
 >>>>>>> master
 import mapStyles from "./mapStyles";
 import axios from 'axios';
