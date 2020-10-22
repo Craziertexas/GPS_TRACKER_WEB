@@ -1,5 +1,9 @@
 import React, { Component} from 'react';
+<<<<<<< HEAD
 import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox} from "@react-google-maps/api";
+=======
+import ReactDOM from 'react-dom';
+>>>>>>> master
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -254,10 +258,16 @@ class App extends Component {
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
+<<<<<<< HEAD
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%",border:"3px solid #54bfbc"}}>
     <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}>Follow truck  <span role="img" aria-label="Onlocation">📍</span></Button>
     </div>
 
+=======
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%"}}>
+    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}> Follow Truck <span role="img" aria-label="Onlocation">📍</span></Button>
+    </div>
+>>>>>>> master
     <SlidingPanel
         type={'left'}
         isOpen={this.state.openPanel}
@@ -462,8 +472,13 @@ class App extends Component {
     </GoogleMap>
 
     </LoadScript>
+<<<<<<< HEAD
     <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen,border:"3px solid #ff0000"}}>
       <h4 style={{left:'4%',backgroundColor:'white',width:'95%',background:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+=======
+    <div style={{left:'80%',top:'20%',position:'absolute',width:'30%',height:'10%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen}}>
+      <h4 style={{backgroundColor:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+>>>>>>> master
     </div>
     </div>
   );
