@@ -7,6 +7,7 @@ import DateTimePicker from 'react-datetime-picker';
 import Switch from "react-switch";
 import SlidingPanel from 'react-sliding-side-panel';
 import Select from 'react-select';
+import ReactDOM from 'react-dom';
 
 const API_KEY = process.env.REACT_APP_MAPS_API;
 
@@ -46,7 +47,7 @@ const searchBoxStyle={
   position: "absolute",
   left: '48%',
   top: '2%',
-  marginLeft: '-120px'
+  marginLeft: '-120px',
 }
 
 const libraries=["places"]
@@ -109,7 +110,10 @@ class App extends Component {
         lng:0
       },
       sw_info_tag:false,
-      Isopen:'hidden'
+      Isopen:'hidden',
+      border_color:"3px solid #ff4d4d",
+      no_data:'hidden',
+      markref:React.createRef()
     };
 
   }
@@ -141,7 +145,6 @@ class App extends Component {
           var buff_lng=(res.data[0].lng).toString();
           var buff_time=(res.data[0].timegps).toString();
           var buff_alt=(res.data[0].alt).toString();
-          console.log(this.state.sw_center);
           if (this.state.sw_center){
             this.setState({
               coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time},
@@ -173,7 +176,16 @@ class App extends Component {
           history:buff
         });
       });
-
+    
+    if (typeof this.state.history[0]==='undefined'){
+      this.setState({
+        no_data:'visible'
+      })
+    }else{
+      this.setState({
+        no_data:'hidden'
+      })
+    }
   }
 
   callAPI_trace(){
@@ -226,6 +238,14 @@ class App extends Component {
 
   }
 
+  CreateMarker(event){
+    console.log("click");
+    console.log(event.latLng.lat());
+    console.log(event.latLng.lng());
+    //let marker = <Marker position={{lat:event.latLng.lat(),lng:event.latLng.lng()}}></Marker>
+    //ReactDOM.hydrate(marker,document.getElementById('mark'));
+  }
+
   set_timer1(){
     this.timer1 = setInterval(() => {this.callAPI_actual();}, 1000);
   }
@@ -249,13 +269,30 @@ class App extends Component {
   }
 
   render(){return (
-    <div class="Contenedor">
+    <div class="Contenedor" id='app'>
     <title>GPS TIO RICO</title>
     <div style={{zIndex:'6', position:"absolute", top:"5%", left:"0%"}}>
     <Button onClick={()=>{this.setState({openPanel:!this.state.openPanel})}} style={{color:'black',background:'#54bfbc',cursor:'pointer'}}>⋙</Button>
     </div>
-    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%",border:"3px solid #54bfbc"}}>
-    <Button onClick={()=>{this.setState({sw_center:!this.state.sw_center})}} style={{color:'black',background:'#ffffff',cursor:'pointer'}}>Follow truck  <span role="img" aria-label="Onlocation">📍</span></Button>
+    <div style={{zIndex:'6', position:"absolute", top:"5%", left:"90%",border:this.state.border_color}}>
+    <Button 
+      onClick={()=>{
+        this.setState({sw_center:!this.state.sw_center});
+        if (this.state.sw_center){
+          this.setState({
+            border_color:"3px solid #54bfbc"
+          })
+        }else{
+          this.setState({
+            border_color:"3px solid #ff4d4d"
+          })
+        }
+      }} 
+      style={{color:'black',background:'#ffffff',cursor:'pointer'}}
+    >
+      Follow truck  
+      <span role="img" aria-label="Onlocation">📍</span>
+    </Button>
     </div>
     <SlidingPanel
         type={'left'}
@@ -274,7 +311,7 @@ class App extends Component {
         <body style={{textAlign:'left', fontSize:'20px'}}>{"Latitude: "+this.state.coord_text.lat}</body>
         <body style={{textAlign:'left', fontSize:'20px'}}>{"Longitude: "+this.state.coord_text.lng}</body>
         <body style={{textAlign:'left', fontSize:'20px'}}>{"Altitude: "+this.state.coord_text.alt}</body>
-        <body style={{textAlign:'left', fontSize:'20px', marginBottom:'10%'}}>{"Timestamp: "+(new Date(parseFloat(this.state.coord_text.time,10)))}</body>
+        <body style={{textAlign:'left', fontSize:'20px', marginBottom:'10%'}}>{"Timestamp: "+(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</body>
         <body style={{fontSize:'20px' ,padding: "1px", float: "left", width: "47%", textAlign: "center", marginBottom: '1%'}}>Initial date</body>
         <body style={{fontSize:'20px', padding: "1px",float: "right", width: "47%", textAlign: "center",marginBottom: '1%'}}>Final date</body>
         <body style={{float:'left',width:'47%', textAling:'center',marginBottom:'10%'}}>
@@ -374,8 +411,15 @@ class App extends Component {
     mapContainerStyle={mapContainerStyle} 
     zoom={15} center={this.state.center} 
     options={options}
+    onClick={(event)=>{
+      this.CreateMarker(event);
+    }}
+    id={'map'}
     >
-
+    <div id={'mark'} style={{zIndex:10,position:'absolute'}}>
+    <Marker position={{lat:10.9878,
+        lng:-74.788}}/>
+    </div>
     <Polyline
       visible={this.state.sw_history}
       path={this.state.history}
@@ -406,7 +450,7 @@ class App extends Component {
         strokeColor:'#140852',
       }}
     />
- 
+
     <Marker
       position={this.state.coord}
       icon={"/truck.svg"}
@@ -461,12 +505,17 @@ class App extends Component {
     </GoogleMap>
 
     </LoadScript>
+
     <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen,border:"3px solid #ff0000"}}>
-      <h4 style={{left:'4%',backgroundColor:'white',width:'95%',background:'white'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("("))[0]}</h4>
+      <h4 style={{left:'4%',backgroundColor:'white',width:'95%'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</h4>
     </div>
+
+    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.no_data,border:"3px solid #ff0000"}}>
+    <h4 style={{left:'25%',backgroundColor:'white',width:'60%'}}>{'No Historic Data'}</h4>
+    </div>
+    
     </div>
   );
-
 }
 
 }

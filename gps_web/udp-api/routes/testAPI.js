@@ -19,7 +19,7 @@ var con = mysql.createConnection({
   host: HOST,
   user: USER,
   password: PASSWORD,
-  database: DATA
+  database: DATA,
 });
 
 function connectDatabase(){
@@ -195,7 +195,6 @@ router.post("/history", function(req, res, next) {
 });
 
 router.post("/history/info", function(req, res, next) {
-  console.log("INFOOOOOOOOOOOOOOOOOOO");
   try{
     var time_in=req.body.timestamp_in;
     var time_fin=req.body.timestamp_fin;
@@ -229,7 +228,7 @@ router.post("/trace", function (req, res, next){
 });
 
 router.post("/last", function(req,res, next){
-
+  console.log("LAST")
   try{
     var truck=req.body.ID;
     async function Last(){
