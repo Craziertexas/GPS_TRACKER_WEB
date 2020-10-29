@@ -1,5 +1,5 @@
 import React, { Component} from 'react';
-import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox} from "@react-google-maps/api";
+import {GoogleMap,Marker, LoadScript, Polyline, StandaloneSearchBox, InfoWindow} from "@react-google-maps/api";
 import mapStyles from "./mapStyles";
 import axios from 'axios';
 import { Button } from 'rebass';
@@ -7,7 +7,6 @@ import DateTimePicker from 'react-datetime-picker';
 import Switch from "react-switch";
 import SlidingPanel from 'react-sliding-side-panel';
 import Select from 'react-select';
-import ReactDOM from 'react-dom';
 
 const API_KEY = process.env.REACT_APP_MAPS_API;
 
@@ -113,7 +112,8 @@ class App extends Component {
       Isopen:'hidden',
       border_color:"3px solid #ff4d4d",
       no_data:'hidden',
-      markref:React.createRef()
+      selectedMarker:null,
+      markers_onclick:[]
     };
 
   }
@@ -236,14 +236,6 @@ class App extends Component {
       })
     })
 
-  }
-
-  CreateMarker(event){
-    console.log("click");
-    console.log(event.latLng.lat());
-    console.log(event.latLng.lng());
-    //let marker = <Marker position={{lat:event.latLng.lat(),lng:event.latLng.lng()}}></Marker>
-    //ReactDOM.hydrate(marker,document.getElementById('mark'));
   }
 
   set_timer1(){
@@ -411,15 +403,13 @@ class App extends Component {
     mapContainerStyle={mapContainerStyle} 
     zoom={15} center={this.state.center} 
     options={options}
-    onClick={(event)=>{
-      this.CreateMarker(event);
+    onRightClick={(event)=>{
+      this.setState({
+        markers_onclick:[...this.state.markers_onclick, {lat:event.latLng.lat(),lng:event.latLng.lng(),ID:new Date()}]
+      });
     }}
-    id={'map'}
     >
-    <div id={'mark'} style={{zIndex:10,position:'absolute'}}>
-    <Marker position={{lat:10.9878,
-        lng:-74.788}}/>
-    </div>
+
     <Polyline
       visible={this.state.sw_history}
       path={this.state.history}
@@ -469,6 +459,43 @@ class App extends Component {
       visible={this.state.sw_his_tag}
     />
 
+    <Marker
+      position={this.state.Infoposition}
+      onDblClick={()=>{
+        this.setState({sw_info_tag:false})
+        if (this.state.Isopen === 'visible'){
+          this.setState({
+            Isopen:'hidden'
+          })
+        }
+      }}
+      onClick={()=>{
+        this.setState({
+          selectedMarker:true
+        });
+      }}
+      visible={this.state.sw_info_tag && this.state.sw_history}>
+        
+      {this.state.selectedMarker && this.state.sw_history && this.state.sw_info_tag && (
+        <InfoWindow
+          onCloseClick={()=>{
+            this.setState({
+              selectedMarker:null
+            })
+            }}>
+              <div>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</div>
+        </InfoWindow>      
+      )}
+
+    </Marker>
+
+    {this.state.markers_onclick.map((marker) => (
+      <Marker
+      key={(marker.ID).getTime()}
+      position={{lat:marker.lat,lng:marker.lng}}
+      />
+    ))}
+
     <StandaloneSearchBox
       onLoad={(ref)=>{this.searchBox = ref}}
       onPlacesChanged={()=>{
@@ -489,26 +516,9 @@ class App extends Component {
 
     </StandaloneSearchBox>
 
-    <Marker
-      position={this.state.Infoposition}
-      onDblClick={()=>{
-        this.setState({sw_info_tag:false})
-        if (this.state.Isopen === 'visible'){
-          this.setState({
-            Isopen:'hidden'
-          })
-        }
-      }}
-      visible={this.state.sw_info_tag}>
-    </Marker>
-    
     </GoogleMap>
 
     </LoadScript>
-
-    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.Isopen,border:"3px solid #ff0000"}}>
-      <h4 style={{left:'4%',backgroundColor:'white',width:'95%'}}>{(((new Date(parseFloat(this.state.Infotime,10))) + "").split("GMT"))[0]}</h4>
-    </div>
 
     <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.no_data,border:"3px solid #ff0000"}}>
     <h4 style={{left:'25%',backgroundColor:'white',width:'60%'}}>{'No Historic Data'}</h4>
