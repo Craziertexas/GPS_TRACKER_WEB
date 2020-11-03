@@ -133,6 +133,8 @@ function GetTrace(truck, trace_init, trace_actual){
   });
 }
 
+function Sendroute()
+
 var server= udp.createSocket('udp4');
 server.bind(5000);
 

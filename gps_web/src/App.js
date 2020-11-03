@@ -259,18 +259,24 @@ class App extends Component {
   }
 
   DinamicMarker(event){
+    const timestamp = (new Date()).getTime();
     this.setState({
-      markers_onclick:[...this.state.markers_onclick, {lat:event.latLng.lat(),lng:event.latLng.lng(),ID:(this.state.markers_onclick.length+1)}]
+      markers_onclick:[...this.state.markers_onclick, {lat:event.latLng.lat(),lng:event.latLng.lng(),ID:timestamp}]
     });
     this.PathExtractor(this.state.markers_onclick);
   }
 
+  DeleteDinamicMarker(markerID){
+    this.setState({
+      markers_onclick:this.state.markers_onclick.filter((({ID})=> {return ID!==markerID}))
+    });
+    this.PathExtractor(this.state.markers_onclick);
+  }
 
   PathExtractor(array){
     this.setState({
       path_onclick:array.map(({lat,lng}) => {return {lat:lat,lng:lng}})
     });
-    console.log(this.state.path_onclick);
   }
 
   set_timer1(){
@@ -549,10 +555,8 @@ class App extends Component {
       <Marker
       key={(marker.ID)}
       position={{lat:marker.lat,lng:marker.lng}}
-      onClick={(event)=>{
-        const filter=marker.ID;
-        console.log(filter)
-        console.log(this.state.markers_onclick.filter((({ID})=> {return ID=marker.ID})))
+      onClick={()=>{
+        this.DeleteDinamicMarker(marker.ID);
       }}
       />
     ))}
