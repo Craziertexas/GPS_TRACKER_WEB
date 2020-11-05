@@ -133,14 +133,16 @@ function GetTrace(truck, trace_init, trace_actual){
   });
 }
 
+function Sendroute()
+
 var server= udp.createSocket('udp4');
 server.bind(5000);
 
 server.on('listening',function(){
   try{
-    address=server.address();
-    port= address.port;
-    ipaddr = address.address;
+    const address=server.address();
+    const port= address.port;
+    const ipaddr = address.address;
     console.log('Server is listening at port ' + port);
     console.log('Server ip :' + ipaddr);
     connectDatabase()
@@ -222,13 +224,13 @@ router.post("/trace", function (req, res, next){
     }
     Trace()
   }catch(error){
-    console.error();
+    console.error(error);
   }
 
 });
 
 router.post("/last", function(req,res, next){
-  console.log("LAST")
+  console.log("LAST");
   try{
     var truck=req.body.ID;
     async function Last(){
@@ -237,9 +239,20 @@ router.post("/last", function(req,res, next){
     }
     Last();
   }catch(error){
-    console.error();
+    console.error(error);
   }
 
+});
+
+router.post("/route", function(req,res,next){
+  console.log("ROUTE");
+  try{
+    var route=req.body.route;
+    console.log(route);
+    res.json("TODO MELO");
+  }catch(error){
+    console.error(error);
+  }
 });
 
 module.exports = router;

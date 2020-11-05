@@ -20,6 +20,8 @@ const API_URL_4 = process.env.REACT_APP_API_URL_4;
 
 const API_URL_5 = process.env.REACT_APP_API_URL_5;
 
+const API_URL_6 = process.env.REACT_APP_API_URL_6;
+
 const mapContainerStyle = {
   width: "100vw",
   height: "100vh",
@@ -113,7 +115,8 @@ class App extends Component {
       border_color:"3px solid #ff4d4d",
       no_data:'hidden',
       selectedMarker:null,
-      markers_onclick:[]
+      markers_onclick:[],
+      path_onclick:[]
     };
 
   }
@@ -236,6 +239,44 @@ class App extends Component {
       })
     })
 
+  }
+
+  callAPI_sendRoute(route){
+    axios.post(API_URL_6,({
+      route:route
+    }))
+
+    .then((res) => {
+      console.log(res)
+    })
+
+    .catch((error) => {
+      alert(error);
+    })
+
+    console.log('SendRoute');
+
+  }
+
+  DinamicMarker(event){
+    const timestamp = (new Date()).getTime();
+    this.setState({
+      markers_onclick:[...this.state.markers_onclick, {lat:event.latLng.lat(),lng:event.latLng.lng(),ID:timestamp}]
+    });
+    this.PathExtractor(this.state.markers_onclick);
+  }
+
+  DeleteDinamicMarker(markerID){
+    this.setState({
+      markers_onclick:this.state.markers_onclick.filter((({ID})=> {return ID!==markerID}))
+    });
+    this.PathExtractor(this.state.markers_onclick);
+  }
+
+  PathExtractor(array){
+    this.setState({
+      path_onclick:array.map(({lat,lng}) => {return {lat:lat,lng:lng}})
+    });
   }
 
   set_timer1(){
@@ -393,6 +434,21 @@ class App extends Component {
       </h1>    
  
     </SlidingPanel>
+    
+    <div style={{left:'90%',top:'15%',position:'absolute',zIndex:'10',width:'6.5%',height:'4%'}}>
+      <button
+      onClick={()=>{
+        this.callAPI_sendRoute(this.state.markers_onclick);
+      }}
+      style={{color:'black',background:'#ffffff',cursor:'pointer'}}
+      >
+        Enviar Ruta
+      </button>
+    </div>
+
+    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.no_data,border:"3px solid #ff0000"}}>
+    <h4 style={{left:'25%',backgroundColor:'white',width:'60%'}}>{'No Historic Data'}</h4>
+    </div>
   
     <LoadScript
        googleMapsApiKey={API_KEY}
@@ -404,9 +460,7 @@ class App extends Component {
     zoom={15} center={this.state.center} 
     options={options}
     onRightClick={(event)=>{
-      this.setState({
-        markers_onclick:[...this.state.markers_onclick, {lat:event.latLng.lat(),lng:event.latLng.lng(),ID:new Date()}]
-      });
+      this.DinamicMarker(event);
     }}
     >
 
@@ -438,6 +492,14 @@ class App extends Component {
       path={this.state.trace}
       options={{
         strokeColor:'#140852',
+      }}
+    />
+
+    <Polyline
+      visible={true}
+      path={this.state.path_onclick}
+      options={{
+        strokeColor:'#32a852',
       }}
     />
 
@@ -491,8 +553,11 @@ class App extends Component {
 
     {this.state.markers_onclick.map((marker) => (
       <Marker
-      key={(marker.ID).getTime()}
+      key={(marker.ID)}
       position={{lat:marker.lat,lng:marker.lng}}
+      onClick={()=>{
+        this.DeleteDinamicMarker(marker.ID);
+      }}
       />
     ))}
 
@@ -519,10 +584,6 @@ class App extends Component {
     </GoogleMap>
 
     </LoadScript>
-
-    <div style={{left:'42.5%',top:'90%',position:'absolute',width:'22%',height:'5%',backgroundColor:'white',zIndex:'10',visibility:this.state.no_data,border:"3px solid #ff0000"}}>
-    <h4 style={{left:'25%',backgroundColor:'white',width:'60%'}}>{'No Historic Data'}</h4>
-    </div>
     
     </div>
   );
