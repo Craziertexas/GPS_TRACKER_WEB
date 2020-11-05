@@ -151,11 +151,13 @@ class App extends Component {
           if (this.state.sw_center){
             this.setState({
               coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time},
-              center:{lng:parseFloat(buff_lng),lat:parseFloat(buff_lat)}
+              center:{lng:parseFloat(buff_lng),lat:parseFloat(buff_lat)},
+              Infotime:buff_time,
             });
           }else{
             this.setState({
-              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time}
+              coord_text:{lng:buff_lng,lat:buff_lat,alt:buff_alt,time:buff_time},
+              Infotime:buff_time,
             });
           }
 
