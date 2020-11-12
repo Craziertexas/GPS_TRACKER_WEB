@@ -70,6 +70,39 @@ function Updatetable(message){
 
 }
 
+function UpdateRoute(route) {
+    return route.map((coord) => {
+      var sql = ("INSERT INTO Ruta (timegps,lat,lng) VALUES (").concat((coord.ID.toString()),",",(coord.lat.toString()),"," ,(coord.lng.toString()),')');
+      con.query(sql, function (err, result) {
+        if (err) {
+          throw err
+        } else {
+          console.log('1 Marker Inserted');
+        };
+
+      });
+    })
+}
+
+function CleanRoute() {
+  var sql = "TRUNCATE TABLE Ruta;"
+  con.query(sql, function (err, result) {
+    if (err) {
+      throw err
+    } else {
+      console.log('Table Clean');
+    };
+  });
+}
+
+function QueryRoute() {
+  return new Promise((resolve, reject) => {
+    con.query('SELECT * FROM Ruta',function (err, result) {
+      return err ? reject(err): resolve(result);
+    })
+  })
+}
+
 function Getusers(){
 
   return new Promise((resolve,reject)=>{
@@ -133,7 +166,7 @@ function GetTrace(truck, trace_init, trace_actual){
   });
 }
 
-server= udp.createSocket('udp4');
+server = udp.createSocket('udp4');
 server.bind(5000);
 
 server.on('listening',function(){
@@ -246,10 +279,26 @@ router.post("/route", function(req,res,next){
   console.log("ROUTE");
   try{
     var route=req.body.route;
-    console.log(route);
-    res.json("TODO MELO");
+    async function Route() {
+      await CleanRoute();
+      await UpdateRoute(route);
+      res.json('OK');
+    }
+    Route();
   }catch(error){
     console.error(error);
+  }
+});
+
+router.get("/route", function(req,res){
+  console.log("GET ON /ROUTE");
+  try{
+    async function GetRoute() {
+      res.json(await QueryRoute());
+    }
+    GetRoute();
+  }catch(error){
+    console.log(error);
   }
 });
 
